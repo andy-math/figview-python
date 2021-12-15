@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- 新 Bootstrap5 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css">
+    <!--  popper.min.js 用于弹窗、提示、下拉菜单 -->
+    <script src="https://cdn.staticfile.org/popper.js/2.9.3/umd/popper.min.js"></script>
+    <!-- 最新的 Bootstrap5 核心 JavaScript 文件 -->
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="card" style="width:370px" v-for="fig in data">
+            <div class="card-body">
+                <h4 class="card-title">figure {{fig.figure}}</h4>
+            </div>
+            <div v-bind:id="fig.name" class="carousel slide card-img-bottom" data-bs-ride="carousel"
+                data-bs-interval="false">
+
+                <!-- 指示符 -->
+                <div class="carousel-indicators">
+                    <button type="button" v-bind:data-bs-target="'#'+fig.name" data-bs-slide-to="0" class="active" />
+                    <button type="button" v-bind:data-bs-target="'#'+fig.name" data-bs-slide-to="1" />
+                    <button type="button" v-bind:data-bs-target="'#'+fig.name" data-bs-slide-to="2" />
+                </div>
+
+                <!-- 轮播图片 -->
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <p class="my-date-text">{{fig.id_list[0].time}}</p>
+                        <img v-bind:src="fig.id_list[0].src" class="d-block" style="width:100%">
+                    </div>
+                    <div class="carousel-item">
+                        <p class="my-date-text">{{fig.id_list[0].time}}</p>
+                        <img v-bind:src="fig.id_list[0].src" class="d-block" style="width:100%">
+                    </div>
+                    <div class="carousel-item">
+                        <p class="my-date-text">{{fig.id_list[0].time}}</p>
+                        <img v-bind:src="fig.id_list[0].src" class="d-block" style="width:100%">
+                    </div>
+                </div>
+
+                <!-- 左右切换按钮 -->
+                <button class="carousel-control-prev" type="button" v-bind:data-bs-target="'#'+fig.name"
+                    data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" v-bind:data-bs-target="'#'+fig.name"
+                    data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const app = {
+            data() {
+                return {
+                    data: [],
+                }
+            },
+            mounted() {
+                axios.get('listfig').then((response) => {
+                    console.log(response);
+                    if (response.status == 200) {
+                        this.data = response.data;
+                    }
+                })
+            }
+        }
+
+        Vue.createApp(app).mount('#app')
+    </script>
+</body>
+
+<style>
+    .my-date-text {
+        margin-left: 10%;
+        margin-bottom: 0;
+        box-sizing: border-box;
+    }
+
+    .carousel-control-prev-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+    }
+
+    .carousel-control-next-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 10%;
+    }
+
+    .carousel-indicators [data-bs-target] {
+        background-color: #000000;
+    }
+
+    .carousel-indicators {
+        opacity: 0.5;
+        margin-bottom: 0;
+        margin-left: 10%;
+        margin-right: 10%;
+    }
+
+    .card-body {
+        padding-bottom: 0;
+    }
+
+    #app {
+        display: flex;
+        flex-wrap: wrap;
+    }
+</style>
+
+</html>
