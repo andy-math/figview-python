@@ -1,14 +1,15 @@
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import wraps
 from typing import Any, Callable, Dict, List, Tuple
 
 from flask import Flask, Response, jsonify, request
-from sqlalchemy import BLOB, TIMESTAMP, Column, Integer, create_engine  # type: ignore
+from sqlalchemy import (BLOB, TIMESTAMP, Column, Integer,  # type: ignore
+                        create_engine)
 from sqlalchemy.orm import declarative_base, sessionmaker  # type: ignore
 from sqlalchemy.sql import func  # type: ignore
 
-engine = create_engine("sqlite:///figview.db", echo=True, encoding="utf-8")
+engine = create_engine("sqlite:///figview.db", encoding="utf-8")
 Base = declarative_base()
 
 
@@ -94,7 +95,9 @@ def listfig() -> Response:
     for f in figs:
         if f.figure not in res:
             res[f.figure] = []
-        res[f.figure].append((f.timestamp, f.id))
+        res[f.figure].append(
+            (f.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None), f.id)
+        )
 
     def key(x: Tuple[datetime, int]) -> datetime:
         return x[0]

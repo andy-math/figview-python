@@ -24,25 +24,26 @@
 
                 <!-- 指示符 -->
                 <div class="carousel-indicators">
-                    <button type="button" v-bind:data-bs-target="'#'+fig.name" data-bs-slide-to="0" class="active" />
-                    <button type="button" v-bind:data-bs-target="'#'+fig.name" data-bs-slide-to="1" />
-                    <button type="button" v-bind:data-bs-target="'#'+fig.name" data-bs-slide-to="2" />
+                    <template v-for="(svg, index) in fig.id_list">
+                        <button type="button" v-bind:data-bs-target="'#'+fig.name" v-bind:data-bs-slide-to="index"
+                            class="active" v-if="index === 0" />
+                        <button type="button" v-bind:data-bs-target="'#'+fig.name" v-bind:data-bs-slide-to="index"
+                            v-else />
+                    </template>
                 </div>
 
                 <!-- 轮播图片 -->
                 <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <p class="my-date-text">{{fig.id_list[0].time}}</p>
-                        <img v-bind:src="fig.id_list[0].src" class="d-block" style="width:100%">
-                    </div>
-                    <div class="carousel-item">
-                        <p class="my-date-text">{{fig.id_list[0].time}}</p>
-                        <img v-bind:src="fig.id_list[0].src" class="d-block" style="width:100%">
-                    </div>
-                    <div class="carousel-item">
-                        <p class="my-date-text">{{fig.id_list[0].time}}</p>
-                        <img v-bind:src="fig.id_list[0].src" class="d-block" style="width:100%">
-                    </div>
+                    <template v-for="(svg, index) in fig.id_list">
+                        <div class="carousel-item active" v-if="index === 0">
+                            <p class="my-date-text">{{svg.time}}</p>
+                            <img v-bind:src="svg.src" class="d-block" style="width:100%">
+                        </div>
+                        <div class="carousel-item" v-else>
+                            <p class="my-date-text">{{svg.time}}</p>
+                            <img v-bind:src="svg.src" class="d-block" style="width:100%">
+                        </div>
+                    </template>
                 </div>
 
                 <!-- 左右切换按钮 -->
@@ -65,12 +66,16 @@
                 }
             },
             mounted() {
-                axios.get('listfig').then((response) => {
+                onNext = (response, onNext) => {
                     console.log(response);
                     if (response.status == 200) {
                         this.data = response.data;
+                    } else {
+                        alert("断流！");
                     }
-                })
+                    axios.get('listfig').then((response) => onNext(response, onNext));
+                }
+                axios.get('listfig').then((response) => onNext(response, onNext));
             }
         }
 
