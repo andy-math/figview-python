@@ -66,16 +66,23 @@
                 }
             },
             mounted() {
+                onError = (error) => {
+                    console.log(error);
+                    alert("断流！");
+                }
                 onNext = (response, onNext) => {
-                    console.log(response);
                     if (response.status == 200) {
                         this.data = response.data;
                     } else {
-                        alert("断流！");
+                        onError(response);
                     }
-                    axios.get('listfig').then((response) => onNext(response, onNext));
+                    axios.get('listfig').then((response) => {
+                        onNext(response, onNext);
+                    }).catch(onError);
                 }
-                axios.get('listfig').then((response) => onNext(response, onNext));
+                axios.get('listfig').then((response) => {
+                    onNext(response, onNext);
+                }).catch(onError);
             }
         }
 
