@@ -1,6 +1,6 @@
 import threading
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Tuple
+from typing import Dict, List, Tuple
 
 from flask import Flask, Response, jsonify, request
 from sqlalchemy import ForeignKey  # type: ignore
@@ -45,10 +45,10 @@ Base.metadata.create_all(engine)
 
 
 Session = sessionmaker(bind=engine)
-_sessions: Dict[int, Any] = {}
+_sessions: Dict[int, sessionmaker] = {}
 
 
-def get_session() -> Any:
+def get_session() -> sessionmaker:
     id = threading.get_ident()
     if id not in _sessions:
         _sessions[id] = Session()
