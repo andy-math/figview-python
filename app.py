@@ -1,6 +1,7 @@
 import threading
 from datetime import datetime, timezone
-from typing import Dict, List, Tuple
+from functools import wraps
+from typing import Callable, Dict, List, Tuple
 
 from flask import Flask, Response, jsonify, request
 from sqlalchemy import ForeignKey  # type: ignore
@@ -56,6 +57,23 @@ def get_session() -> sessionmaker:
     return _sessions[id]
 
 
+timestamp = ""
+
+
+def onChange(f: Callable[[], Response]) -> Callable[[], Response]:
+    @wraps(f)
+    def impl() -> Response:
+        global timestamp
+        value = f()
+        timestamp = str(datetime.now())
+        return value
+
+    return impl
+
+
+onChange(lambda: Response())()
+
+
 app = Flask(__name__)
 
 
@@ -63,6 +81,11 @@ app = Flask(__name__)
 def index() -> str:
     with open("index.html", encoding="utf-8") as f:
         return f.read()
+
+
+@app.route("/timestamp")
+def gettime() -> str:
+    return timestamp
 
 
 @app.route("/figure")
@@ -76,6 +99,7 @@ def figure() -> Response:
 
 
 @app.route("/addfig", methods=["POST"])
+@onChange
 def addfig() -> Response:
     figure = request.args["fig"]
     session = get_session()
