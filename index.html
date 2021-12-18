@@ -59,41 +59,44 @@
         </div>
     </div>
     <script>
+        'use strict'
+        let timestamp = "";
         const app = {
             data() {
-                return {
-                    timestamp: "",
-                    data: [],
-                }
+                return { data: [] }
             },
             mounted() {
-                onError = (error) => {
+                const onError = (error) => {
                     console.log(error);
                     alert("断流！");
                 }
 
-                onRefresh = (response, onNext, timestamp) => {
+                const checkStatus = (response, f) => {
                     if (response.status === 200) {
-                        this.data = response.data;
-                        this.timestamp = timestamp;
+                        f(response);
                     } else {
                         onError(response);
                     }
                 }
 
-                onNext = (response, onNext) => {
-                    url = 'timestamp'
-                    onResponse = ((response) => { })
-                    if (response.status === 200) {
-                        if (response.data !== this.timestamp) {
+                const onRefresh = (response, onNext, stamp) => {
+                    checkStatus(response, (response) => {
+                        this.data = response.data;
+                        timestamp = stamp;
+                    })
+                }
+
+                const onNext = (response, onNext) => {
+                    let url = 'timestamp'
+                    let onResponse = ((response) => { })
+                    checkStatus(response, (response) => {
+                        if (response.data !== timestamp) {
                             url = 'listfig'
                             onResponse = ((r) => onRefresh(r, onNext, response.data))
                         } else {
                             //时间戳一样，什么也不做
                         }
-                    } else {
-                        onError(response);
-                    }
+                    })
                     setTimeout(() => {
                         axios.get(url).then((response) => {
                             onResponse(response);
